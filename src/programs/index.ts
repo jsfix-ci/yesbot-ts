@@ -15,7 +15,6 @@ import * as WhereAreYouFrom from "./where-are-you-from";
 import Deadchat from "./deadchat";
 import ExportManager from "./export-manager";
 import Polls from "./polls";
-import Profile from "./profile";
 import ReactRole from "./react-role";
 import Resource from "./resources";
 import Someone from "./someone-tag";
@@ -33,7 +32,6 @@ export {
   MapTools,
   NitroColors,
   Polls,
-  Profile,
   ReactRole,
   Resource,
   DailyChallenge,

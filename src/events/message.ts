@@ -8,7 +8,6 @@ import {
   GroupManager,
   MapTools,
   Polls,
-  Profile,
   ReactRole,
   Resource,
   Someone,
@@ -125,7 +124,6 @@ const routeMessage = async (message: Message) => {
         !message.content.toLowerCase().startsWith("!group toggle")
       )
         await GroupManager(message, true);
-      if (firstWord === "!profile") await Profile(message);
       if (firstWord === "!addChallenge")
         await saveToDb("daily-challenge", restOfMessage, message);
       if (firstWord === "!todayChallenge")
@@ -137,7 +135,6 @@ const routeMessage = async (message: Message) => {
         !message.content.toLowerCase().startsWith("!group toggle")
       )
         await GroupManager(message, true);
-      if (firstWord === "!profile") await Profile(message);
       if (firstWord === "!birthday") await BirthdayManager(message);
 
       if (firstWord === "!voice") await VoiceOnDemand(message);
