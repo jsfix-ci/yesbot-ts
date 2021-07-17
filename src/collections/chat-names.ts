@@ -1,4 +1,5 @@
 export enum ChatNames {
+  BOT_COMMANDS = "bot-commands",
   BOT_DEVELOPMENT = "bot-development",
   CHAT = "chat",
   CHAT_FIVE = "chat-v",
