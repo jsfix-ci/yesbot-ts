@@ -34,11 +34,11 @@ export default class MockDiscord {
     this.mockGuildChannel();
     this.mockTextChannel();
     this.mockUser();
-    this.mockGuildMember();
     this.addMember();
     this.mockMessage();
     this.mockMessageReaction();
     this.mockRole();
+    this.mockGuildMember();
     this.mockVoiceState();
   }
 
@@ -181,7 +181,7 @@ export default class MockDiscord {
         nick: "nick",
         joined_at: new Date("2020-01-01").getTime(),
         user: this.user,
-        roles: [],
+        roles: [this.role],
       },
       this.guild
     );
@@ -228,7 +228,14 @@ export default class MockDiscord {
   }
 
   private mockRole() {
-    this.role = new Role(this.client, {}, this.guild);
+    this.role = new Role(
+      this.client,
+      {
+        id: "23968d6c-d134-4ad6-8a28-27c0f4aaf73a",
+        name: "Germany 🇩🇪",
+      },
+      this.guild
+    );
   }
 
   private mockVoiceState() {

@@ -14,14 +14,6 @@ interface GetProfileUsecaseInput {
 export class GetProfileUsecase
   implements UseCase<GetProfileUsecaseInput, void>
 {
-  private static instance: GetProfileUsecase;
-
-  private constructor() {}
-
-  public static get Instance() {
-    return this.instance || (this.instance = new this());
-  }
-
   private static async checkMemberAvailable(input: GetProfileUsecaseInput) {
     if (!input.requestedMember) {
       await Tools.handleUserError(
@@ -122,7 +114,7 @@ export class GetProfileUsecase
     );
   };
 
-  private getCountries(member: GuildMember) {
+  private getCountries(member: GuildMember): string[] {
     return member.roles.cache
       .filter((role) => {
         return CountryRoleFinder.isCountryRole(role.name, true);

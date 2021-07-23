@@ -8,6 +8,7 @@ import {
 import { GuildMemberUpdateArgument } from "../event-distribution/events/guild-member-update";
 import { MemberLeaveArgument } from "../event-distribution/events/member-leave";
 import { VoiceStateChange } from "../event-distribution/events/voice-state-update";
+import { createYesBotLogger } from "../log";
 
 /**
  * Example of a stateless message handler (stateful: true missing in config).
@@ -24,7 +25,7 @@ export class DecoratorTest extends CommandHandler<DiscordEvent.MESSAGE> {
 
   handle(): void {
     ++this.called;
-    console.log(`Called handler 1 ${this.called} times`);
+    logger.info(`Called handler 1 ${this.called} times`);
   }
 }
 
@@ -46,7 +47,7 @@ export class DecoratorTest2 extends CommandHandler<DiscordEvent.MESSAGE> {
 
   async handle(message: Message): Promise<void> {
     ++this.called;
-    console.log(`Called handler 2 ${this.called} times`);
+    logger2.info(`Called handler 2 ${this.called} times`);
   }
 }
 
@@ -66,7 +67,7 @@ export class DecoratorTest3 extends CommandHandler<DiscordEvent.MESSAGE> {
 
   handle(message: Message): void {
     ++this.called;
-    console.log(`Called handler 3 ${this.called} times`);
+    logger3.info(`Called handler 3 ${this.called} times`);
   }
 }
 
@@ -82,7 +83,7 @@ export class DecoratorTest3 extends CommandHandler<DiscordEvent.MESSAGE> {
 })
 export class DecoratorTest4 extends CommandHandler<DiscordEvent.REACTION_ADD> {
   handle(reaction: MessageReaction, user: User): void {
-    console.log("Called handler 4");
+    logger4.info("Called handler 4");
   }
 }
 
@@ -100,7 +101,7 @@ export class DecoratorTest5 extends CommandHandler<DiscordEvent.GUILD_MEMBER_UPD
     oldMember: GuildMemberUpdateArgument,
     newMember: GuildMemberUpdateArgument
   ): void {
-    console.log("Called handler 5");
+    logger5.info("Called handler 5");
   }
 }
 
@@ -112,7 +113,7 @@ export class DecoratorTest5 extends CommandHandler<DiscordEvent.GUILD_MEMBER_UPD
 })
 export class DecoratorTest6 extends CommandHandler<DiscordEvent.READY> {
   handle(client: Client): void {
-    console.log("Called handler 6");
+    logger6.info("Called handler 6");
   }
 }
 
@@ -125,7 +126,7 @@ export class DecoratorTest6 extends CommandHandler<DiscordEvent.READY> {
 })
 export class DecoratorTest7 extends CommandHandler<DiscordEvent.VOICE_STATE_UPDATE> {
   handle(oldState: VoiceState, newState: VoiceState): void {
-    console.log("Called handler 7");
+    logger7.info("Called handler 7");
   }
 }
 
@@ -137,6 +138,15 @@ export class DecoratorTest7 extends CommandHandler<DiscordEvent.VOICE_STATE_UPDA
 })
 export class DecoratorTest8 extends CommandHandler<DiscordEvent.MEMBER_LEAVE> {
   handle(member: MemberLeaveArgument): void {
-    console.log("Called handler 8");
+    logger8.info("Called handler 8");
   }
 }
+
+const logger8 = createYesBotLogger("programs", DecoratorTest8.name);
+const logger7 = createYesBotLogger("programs", DecoratorTest7.name);
+const logger6 = createYesBotLogger("programs", DecoratorTest6.name);
+const logger5 = createYesBotLogger("programs", DecoratorTest5.name);
+const logger4 = createYesBotLogger("programs", DecoratorTest4.name);
+const logger3 = createYesBotLogger("programs", DecoratorTest3.name);
+const logger2 = createYesBotLogger("programs", DecoratorTest2.name);
+const logger = createYesBotLogger("programs", DecoratorTest.name);

@@ -12,7 +12,7 @@ import { createYesBotLogger } from "../../../log";
   event: DiscordEvent.READY,
 })
 export class ReleaseNotesController extends CommandHandler<DiscordEvent.READY> {
-  private githubReleaseNotesUseCase;
+  private githubReleaseNotesUseCase: GithubReleaseNotesUsecase;
 
   constructor() {
     super();
@@ -20,7 +20,7 @@ export class ReleaseNotesController extends CommandHandler<DiscordEvent.READY> {
   }
 
   handle(client: Client): void {
-    console.log("start");
+    logger.debug("start fetching Releasenotes");
     this.githubReleaseNotesUseCase.handle().then(async (message) => {
       if (!!message.tagMessage) {
         const updateChannel = client.guilds

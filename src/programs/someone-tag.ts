@@ -3,10 +3,11 @@ import Tools from "../common/tools";
 import axios from "axios";
 import { addHours, isAfter } from "date-fns";
 import prisma from "../prisma";
+import { createYesBotLogger } from "../log";
 
 const QUESTION_LINK: string =
   "https://spreadsheets.google.com/feeds/cells/1eve4McRxECmH4dLWLJvHLr9fErBWcCGiH94ihBNzK_s/1/public/full?alt=json";
-
+const logger = createYesBotLogger("games", "someoneTag");
 const someoneTag = async (message: Message) => {
   const allow = await isAllowed(message.author);
 
@@ -91,7 +92,7 @@ async function updateLastMessage(message: Message) {
       create: data,
     });
   } catch (e) {
-    console.error(`Failed to save @someone for user '${data.id}'`);
+    logger.error(`Failed to save @someone for user '${data.id}'`);
     return false;
   }
 

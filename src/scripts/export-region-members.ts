@@ -2,13 +2,14 @@ import { config } from "dotenv";
 import { Client, Snowflake } from "discord.js";
 import { writeFile } from "fs/promises";
 import { CountryRoleFinder } from "../utils/country-role-finder";
+import { createYesBotLogger } from "../log";
 
 config();
 
 const exportFileName = "region-members-export.json";
-
+const logger = createYesBotLogger("scripts", "ExportRegionMembers");
 const client = new Client();
-client.login(process.env.BOT_TOKEN).then(() => console.log("Logged in"));
+client.login(process.env.BOT_TOKEN).then(() => logger.info("Logged in"));
 
 const main = async () => {
   const guild = client.guilds.resolve(process.env.GUILD_ID);
@@ -29,7 +30,7 @@ const main = async () => {
   const exportString = JSON.stringify(regionToMemberMatch, null, 4);
   await writeFile(exportFileName, exportString, "utf-8");
 
-  console.log("Done, closing client in 3 seconds");
+  logger.info("Done, closing client in 3 seconds");
 
   setTimeout(() => client.destroy(), 3000);
 };

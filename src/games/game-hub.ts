@@ -11,6 +11,7 @@ import { GameSession } from "./game-session";
 import Tools from "../common/tools";
 import { ConfiguratorValidator } from "./configurator-validator";
 import { GameConfigurator } from "./game-configurator";
+import { createYesBotLogger } from "../log";
 
 const generalCommands = ["!rules", "!howtoplay", "!end"];
 
@@ -75,11 +76,11 @@ export default class GameHub {
       validator.validateConfig(config.configuration);
     } catch (e) {
       if (e instanceof Error) {
-        console.error(
+        logger.error(
           `Game ${name} has an invalid configuration: "${e.message}"`
         );
       } else {
-        console.error(`Error registering game ${name}! Error was `, e);
+        logger.error(`Error registering game ${name}! Error was `, e);
       }
       return;
     }
@@ -431,3 +432,5 @@ export default class GameHub {
     );
   }
 }
+
+const logger = createYesBotLogger("games", GameHub.name);
