@@ -15,6 +15,8 @@ import { readFile, writeFile } from "fs";
 import { get, request, RequestOptions } from "https";
 import { exec } from "child_process";
 import { CountryRoleFinder } from "../utils/country-role-finder";
+import { createYesBotLogger } from "../log";
+import { DecoratorTest } from "../programs/decorator-test";
 
 config();
 
@@ -30,7 +32,8 @@ interface StoredInformation {
 
 const infoPath = "./memberMigration.json";
 
-console.log(process.env.ENGINEER_ROLE_NAME);
+const logger = createYesBotLogger("scripts", "MemberMigration");
+logger.info(process.env.ENGINEER_ROLE_NAME);
 
 const loadStoredInformation = async (): Promise<StoredInformation> => {
   return new Promise((res, rej) => {
@@ -43,12 +46,12 @@ const loadStoredInformation = async (): Promise<StoredInformation> => {
 
 const saveStoredInformation = (info: StoredInformation) => {
   writeFile(infoPath, JSON.stringify(info), () =>
-    console.log("Completed write!")
+    logger.info("Completed write!")
   );
 };
 
 const stopScheduling = (reason: string): Promise<void> => {
-  console.log("Stopping scheduling with reason: " + reason);
+  logger.info("Stopping scheduling with reason: " + reason);
 
   const guild = bot.guilds.resolve(guildId);
   const output = guild.channels.cache.find((c) => c.name === "bot-output");
@@ -93,7 +96,7 @@ const stopScheduling = (reason: string): Promise<void> => {
 const getMembers = async (lastId: String) => {
   const query = `?limit=${limit}&after=${lastId}`;
   const path = `/api/guilds/${guildId}/members${query}`;
-  console.log("Loading members from ", path);
+  logger.info("Loading members from ", path);
 
   const options: RequestOptions = {
     host: "discord.com",
@@ -109,7 +112,7 @@ const getMembers = async (lastId: String) => {
 
       response.on("data", (datum) => (data += datum));
       response.on("end", () => {
-        console.log("Request completed with statuscode", response.statusCode);
+        logger.info("Request completed with statuscode", response.statusCode);
         if (response.statusCode === 200) return res(JSON.parse(data));
         rej({ statusCode: response.statusCode, error: data });
       });
@@ -164,7 +167,7 @@ const assignRole = async (userId: Snowflake) => {
 };
 
 const main = async () => {
-  console.log("Script started...");
+  logger.info("Script started...");
 
   const guild = bot.guilds.resolve(guildId);
   if (guild === null) {
@@ -172,7 +175,7 @@ const main = async () => {
   }
 
   const countryRoles = await getCountryRoles(guild);
-  console.log(`Loaded ${countryRoles.length} country roles`);
+  logger.info(`Loaded ${countryRoles.length} country roles`);
 
   const memberRole = guild.roles.resolve(roleId);
   if (!memberRole) {
@@ -181,7 +184,7 @@ const main = async () => {
 
   const { lastMaxUserId } = await loadStoredInformation();
 
-  console.log("Loaded lastMaxUserId:", lastMaxUserId);
+  logger.info("Loaded lastMaxUserId:", lastMaxUserId);
 
   try {
     const members = (await getMembers(lastMaxUserId)) as PartialGuildMember[];
@@ -198,19 +201,19 @@ const main = async () => {
     for (let i = 0; i < filteredMembers.length; i++) {
       const userId = filteredMembers[i];
       if (i % 10 === 0 && i !== 0) {
-        console.log(
+        logger.info(
           "Migrated 10 users; pausing for 11 seconds against rate limits"
         );
         await new Promise((res) => setTimeout(res, 11000));
       }
 
-      console.log(
+      logger.info(
         `Migrating users... Progress: ${i}/${filteredMembers.length}`
       );
       await assignRole(userId);
     }
 
-    console.log(
+    logger.info(
       `Loaded ${members.length} members, migrated ${filteredMembers.length}.`
     );
 
@@ -228,7 +231,7 @@ const main = async () => {
       "Error occured migrating! Stringified error: " + JSON.stringify(e)
     );
   } finally {
-    console.log("Closing down bot!");
+    logger.info("Closing down bot!");
     setTimeout(() => bot.destroy(), 3000);
   }
 };

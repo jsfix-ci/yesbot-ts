@@ -2,11 +2,14 @@ import Tools from "../common/tools";
 import { getUserBirthdate } from "../programs/birthday-manager";
 import { setTimeout } from "timers";
 import prisma from "../prisma";
+import { createYesBotLogger } from "../log";
 
 interface JSONBirthday {
   id: string;
   date: string;
 }
+
+const logger = createYesBotLogger("scripts", "BirthdaysToDatabase");
 
 async function importBirthdaysToDatabase() {
   const birthdays = (<unknown>(
@@ -23,22 +26,22 @@ async function importBirthdaysToDatabase() {
       birthdate: getUserBirthdate(date),
     }));
 
-  console.log(
+  logger.info(
     `Found ${toCreate.length} birthdays to import. Skipping ${existingBirthdayUsers.length} existing birthdays.`
   );
 
   if (toCreate.length === 0) {
-    console.log("No new birthdays to insert.");
+    logger.info("No new birthdays to insert.");
     return;
   }
 
   try {
     await prisma.birthday.createMany({ data: toCreate });
   } catch (err) {
-    console.log("Failed to mass-import birthdays. Error: ", err);
+    logger.info("Failed to mass-import birthdays. Error: ", err);
   }
 
-  console.log("Done");
+  logger.info("Done");
   return;
 }
 

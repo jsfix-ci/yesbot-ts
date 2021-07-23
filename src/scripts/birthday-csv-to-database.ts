@@ -6,6 +6,8 @@ import * as BirthdayManagerTools from "../programs/birthday-manager";
 import { setTimeout } from "timers";
 import { zonedTimeToUtc } from "date-fns-tz";
 import { exit } from "process";
+import { createYesBotLogger } from "../log";
+import { DecoratorTest } from "../programs/decorator-test";
 
 interface CSVBirthday {
   0: string; // UserId
@@ -22,6 +24,8 @@ interface BirthdayCollection {
   [key: string]: Birthday;
 }
 
+const logger = createYesBotLogger("scripts", "BirthdayCSVImporter");
+
 const debug = false;
 
 async function importBirthdaysCsvToDatabase(filename: string) {
@@ -36,7 +40,7 @@ async function importBirthdaysCsvToDatabase(filename: string) {
   // first row for all fields only being letters, we can assume the first row is a header
   const hasHeaders = rawBirthdays[0].split(",").every((col) => /\w+/.test(col));
   if (!hasHeaders) {
-    console.error(
+    logger.error(
       "CSV file is missing CSV headers. I don't know if any of the headers contain a timezone, so I can't help you!"
     );
     return;
@@ -46,7 +50,7 @@ async function importBirthdaysCsvToDatabase(filename: string) {
       .map((col) => col.toLowerCase())
       .indexOf("timezone");
     if (timezoneRow === -1) {
-      console.error(
+      logger.error(
         "No CSV header with timezone information. I can't help you, sorry!"
       );
       return;
@@ -57,10 +61,10 @@ async function importBirthdaysCsvToDatabase(filename: string) {
   const csvBirthdays = (hasHeaders ? rawBirthdays.splice(1) : [...rawBirthdays])
     .filter((row) => row.length > 0) // Also skip empty rows (empty final newline, for example)
     .map((row) => (<unknown>row.split(",")) as CSVBirthday);
-  console.log(`Read ${csvBirthdays.length} birthdays from ${filename}`);
+  logger.info(`Read ${csvBirthdays.length} birthdays from ${filename}`);
   if (debug) {
     [0, 1, 2, 3, 4].forEach((n) =>
-      console.debug(
+      logger.debug(
         `First row: ${csvBirthdays[n]} | timezone in row ${timezoneRow} (${csvBirthdays[n][timezoneRow]})`
       )
     );
@@ -80,14 +84,14 @@ async function importBirthdaysCsvToDatabase(filename: string) {
         const timezone =
           timezoneRow !== -1 ? (row[timezoneRow] as string) : null;
         if (debug) {
-          console.log(
+          logger.info(
             `creating bday with new Date(1970, ${birthmonth}, ${birthdayofmonth}) in ${timezone}`
           );
-          console.log(
+          logger.info(
             "\t => standard ",
             new Date(1970, birthmonth, birthdayofmonth)
           );
-          console.log(
+          logger.info(
             "\t => zoned    ",
             zonedTimeToUtc(
               new Date(1970, birthmonth, birthdayofmonth),
@@ -112,17 +116,17 @@ async function importBirthdaysCsvToDatabase(filename: string) {
   );
 
   if (Object.keys(toCreate).length === 0) {
-    console.log("No new birthdays to insert.");
+    logger.info("No new birthdays to insert.");
     return;
   }
 
-  console.log(`Creating ${Object.keys(toCreate).length} birthdays.`);
+  logger.info(`Creating ${Object.keys(toCreate).length} birthdays.`);
 
   if (debug) {
     Object.keys(toCreate)
       .slice(0, 4)
       .forEach((key) =>
-        console.debug(
+        logger.debug(
           `First row (parsed): ${toCreate[key].userId}:${toCreate[key].birthdate}`
         )
       );
@@ -136,10 +140,10 @@ async function importBirthdaysCsvToDatabase(filename: string) {
 
     await prisma.birthday.createMany({ data: newBirthdays });
   } catch (err) {
-    console.log("Failed to mass-import birthdays. Error: ", err);
+    logger.info("Failed to mass-import birthdays. Error: ", err);
   }
 
-  console.log("Done");
+  logger.info("Done");
   return;
 }
 
@@ -150,7 +154,7 @@ const argv = [...process.argv].filter(
 
 const filename = argv[0];
 if (argv.length === 0 || !filename.toLowerCase().endsWith(".csv")) {
-  console.error(
+  logger.error(
     `Missing CSV file to import. Execute command again with\n\n\tts-node birthdaysCsvToDatabase.ts ./path/to/file.csv\n`
   );
   exit(1);

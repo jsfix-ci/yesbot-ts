@@ -2,8 +2,11 @@ import Tools from "../common/tools";
 import { setTimeout } from "timers";
 import prisma from "../prisma";
 import { ReactionRole } from "@yes-theory-fam/database/client";
+import { createYesBotLogger } from "../log";
 
 type JSONReactionRole = Omit<ReactionRole, "id">;
+
+const logger = createYesBotLogger("scripts", "ReactionRoleObjectsToDataBase");
 
 async function importReactionRoleObjects() {
   const reactionRoles = (<unknown>(
@@ -47,7 +50,7 @@ async function importReactionRoleObjects() {
             existing.roleId === current.roleId)
       )
     ) {
-      console.warn(
+      logger.warn(
         `Skipping duplicate reactionRoleObject: ${current.messageId}+${current.reaction} for chan ${current.channelId}, using existing.`
       );
       continue;
@@ -58,28 +61,28 @@ async function importReactionRoleObjects() {
       !current.reaction ||
       !current.roleId
     ) {
-      console.warn("Skipping item with missing required parameters");
+      logger.warn("Skipping item with missing required parameters");
       continue;
     }
     toCreate2.push(current);
   }
 
-  console.log(
+  logger.info(
     `Found ${toCreate2.length} items to import. Skipping ${existingReactionRoles.length} existing items.`
   );
 
   if (toCreate2.length === 0) {
-    console.log("No new items to insert.");
+    logger.info("No new items to insert.");
     return;
   }
 
   try {
     await prisma.reactionRole.createMany({ data: toCreate2 });
   } catch (err) {
-    console.log("Failed to mass-import reaction role objects. Error: ", err);
+    logger.info("Failed to mass-import reaction role objects. Error: ", err);
   }
 
-  console.log("Done");
+  logger.info("Done");
   return;
 }
 
@@ -87,7 +90,7 @@ const timeout =
   (process.env.YESBOT_SCRIPT_TIMEOUT &&
     parseInt(process.env.YESBOT_SCRIPT_TIMEOUT, 10)) ||
   1000;
-console.log(
+logger.info(
   `Waiting ${timeout}ms before starting import. Configure with environment variable YESBOT_SCRIPT_TIMEOUT=${timeout}`
 );
 setTimeout(importReactionRoleObjects, timeout);
