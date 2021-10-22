@@ -37,7 +37,7 @@ export interface BaseOptions {
 export interface MessageRelatedOptions extends BaseOptions {
   allowedRoles?: string[];
   channelNames?: string[];
-  categoryNames?: string[];
+  parentNames?: string[];
   location?: EventLocation;
 }
 
