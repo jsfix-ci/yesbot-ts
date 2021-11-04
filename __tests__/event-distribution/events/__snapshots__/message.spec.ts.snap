@@ -142,6 +142,7 @@ Object {
 exports[`Messages should extract messages from direct message 1`] = `
 Array [
   Object {
+    "content": "this is the message content",
     "handlerKeys": Array [
       "9007199254740991",
       "this",
@@ -171,6 +172,7 @@ Array [
 exports[`Messages should extract messages from public channel 1`] = `
 Array [
   Object {
+    "content": "this is the message content",
     "handlerKeys": Array [
       "9007199254740991",
       "this",
