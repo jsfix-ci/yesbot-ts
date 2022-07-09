@@ -18,6 +18,7 @@
     "node_modules"
   ],
   "include": [
+    "./environment.d.ts",
     "./index.d.ts",
     "./environment.d.ts",
     "./src",
