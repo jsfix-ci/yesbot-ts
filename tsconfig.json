@@ -6,7 +6,9 @@
     "experimentalDecorators": true,
     "forceConsistentCasingInFileNames": true,
     "lib": [
-      "ES2020"
+      "ES2020",
+      // More or less required by graphql-request; otherwise typing error missing WebSocket
+      "dom"
     ],
     "module": "commonjs",
     "outDir": "build",
