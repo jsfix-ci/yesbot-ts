@@ -10,3 +10,8 @@ src/**/*.js
 db
 /.wakatime-project
 yarn-error.log
+
+# Generated GraphQL files
+schema.graphql
+src/__generated__/
+src/**/*.generated.ts
